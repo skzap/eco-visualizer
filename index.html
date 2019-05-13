@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Avalon Eco Visualizer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.css">
+</head>
+<body>
+    <canvas id='canvas' width="500" height="200"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
+    <script>
+        data = []
+        chart = null
+        setInterval(function(){updateData()}, 3500)
+        updateData()
+
+        function updateData() {
+            fetch('http://localhost:3001/rewardPool')
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(myJson) {
+                    myJson.ts = new Date().getTime()
+                    data.push(myJson)
+                    if (!chart)
+                        createChart()
+                    else
+                        updateChart(myJson)
+                });
+        }
+
+        function updateChart(myJson) {
+            chart.data.labels.push(myJson.ts)
+            chart.data.datasets[0].data.push(myJson.dist)
+            chart.data.datasets[1].data.push(myJson.avail)
+            chart.data.datasets[2].data.push(myJson.votes)
+            chart.data.datasets[3].data.push(myJson.theo)
+            chart.update()
+        }
+
+        function createChart() {
+            var ctx = document.getElementById('canvas')
+            
+            var lineChartData = {
+                labels: data.map(x => x.ts),
+                datasets: [{
+                    label: 'dist',
+                    borderColor: '#F01A30',
+                    backgroundColor: '#F01A30',
+                    fill: false,
+                    lineTension: 0,
+                    pointRadius: 3,
+                    borderWidth: 2,
+                    data: [
+                        data.map(x => x.dist)
+                    ],
+                    yAxisID: 'y-axis-1',
+                }, {
+                    label: 'avail',
+                    borderColor: '#00ff00',
+                    backgroundColor: '#00ff00',
+                    fill: false,
+                    lineTension: 0,
+                    pointRadius: 3,
+                    borderWidth: 2,
+                    data: [
+                        data.map(x => x.avail)
+                    ],
+                    yAxisID: 'y-axis-1'
+                }, {
+                    label: 'votes',
+                    borderColor: '#223154',
+                    backgroundColor: '#223154',
+                    fill: false,
+                    lineTension: 0,
+                    pointRadius: 3,
+                    borderWidth: 2,
+                    data: [
+                        data.map(x => x.votes)
+                    ],
+                    yAxisID: 'y-axis-2'
+                }, {
+                    label: 'theo',
+                    borderColor: '#551a8b',
+                    backgroundColor: '#551a8b',
+                    fill: false,
+                    lineTension: 0,
+                    pointRadius: 3,
+                    borderWidth: 2,
+                    data: [
+                        data.map(x => x.theo)
+                    ],
+                    yAxisID: 'y-axis-1'
+                }]
+		    };
+            chart = Chart.Line(ctx, {
+                data: lineChartData,
+                options: {
+                    responsive: true,
+                    hoverMode: 'index',
+                    stacked: false,
+                    title: {
+                        display: true,
+                        text: 'Avalon Eco Visualizer'
+                    },
+                    scales: {
+                        yAxes: [{
+                            type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                            display: true,
+                            position: 'left',
+                            id: 'y-axis-1',
+                        }, {
+                            type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                            display: true,
+                            position: 'right',
+                            id: 'y-axis-2',
+
+                            // grid line settings
+                            gridLines: {
+                                drawOnChartArea: false, // only want the grid lines for one axis to show up
+                            },
+                        }],
+                    },
+                    animation: {
+                        duration: 0 // general animation time
+                    },
+                    hover: {
+                        animationDuration: 0 // duration of animations when hovering an item
+                    },
+                    responsiveAnimationDuration: 0 // animation duration after a resize
+                }
+            })
+        }
+    </script>
+</body>
+</html>
