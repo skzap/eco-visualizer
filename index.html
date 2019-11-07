@@ -18,7 +18,7 @@
         updateData()
 
         function updateData() {
-            fetch('https://bran.nannal.com/rewardPool')
+            fetch('https://avalon.d.tube/rewardPool')
                 .then(function(response) {
                     return response.json();
                 })
@@ -38,6 +38,7 @@
             chart.data.datasets[1].data.push(myJson.avail)
             chart.data.datasets[2].data.push(myJson.votes)
             chart.data.datasets[3].data.push(myJson.theo)
+            chart.data.datasets[4].data.push(myJson.burn)
             chart.update()
         }
 
@@ -92,6 +93,18 @@
                     borderWidth: 2,
                     data: [
                         data.map(x => x.theo)
+                    ],
+                    yAxisID: 'y-axis-1'
+                }, {
+                    label: 'burn',
+                    borderColor: '#ffcc00',
+                    backgroundColor: '#ffcc00',
+                    fill: false,
+                    lineTension: 0,
+                    pointRadius: 3,
+                    borderWidth: 2,
+                    data: [
+                        data.map(x => x.burn)
                     ],
                     yAxisID: 'y-axis-1'
                 }]
